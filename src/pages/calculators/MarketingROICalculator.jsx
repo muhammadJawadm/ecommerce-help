@@ -1,70 +1,84 @@
 import { useState } from 'react'
 import Calculator from '../../components/Calculator'
+import { useCurrency } from '../../context/CurrencyContext'
 
 export default function MarketingROICalculator() {
   const [adSpend, setAdSpend] = useState(1000)
   const [revenue, setRevenue] = useState(5000)
   const [cogs, setCogs] = useState(1500)
   const [operatingCosts, setOperatingCosts] = useState(800)
+  const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
-  const profit = revenue - cogs - operatingCosts - adSpend
-  const roi = ((profit / adSpend) * 100).toFixed(2)
-  const roas = (revenue / adSpend).toFixed(2)
-  const costPerAcquisition = (adSpend / (revenue / 50)).toFixed(2) // Assuming $50 AOV
-  const profitMargin = ((profit / revenue) * 100).toFixed(2)
+  const adSpendAmount = adSpend ?? 0
+  const revenueAmount = revenue ?? 0
+  const cogsAmount = cogs ?? 0
+  const operatingAmount = operatingCosts ?? 0
+
+  const profit = revenueAmount - cogsAmount - operatingAmount - adSpendAmount
+  const roi = adSpendAmount ? ((profit / adSpendAmount) * 100).toFixed(2) : '0.00'
+  const roas = adSpendAmount ? (revenueAmount / adSpendAmount).toFixed(2) : '0.00'
+  const profitMargin = revenueAmount ? ((profit / revenueAmount) * 100).toFixed(2) : '0.00'
+
+  const clearForm = () => {
+    setAdSpend(null)
+    setRevenue(null)
+    setCogs(null)
+    setOperatingCosts(null)
+  }
 
   return (
     <Calculator
       title="Marketing ROI Calculator"
       description="Calculate return on investment for your marketing campaigns"
+      onClear={clearForm}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Input Section */}
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Ad Spend ($)
+              Ad Spend ({currency})
             </label>
             <input
               type="number"
-              value={adSpend}
-              onChange={(e) => setAdSpend(parseFloat(e.target.value))}
+              value={formatInputValue(adSpend, currency)}
+              onChange={(e) => setAdSpend(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Revenue Generated ($)
+              Revenue Generated ({currency})
             </label>
             <input
               type="number"
-              value={revenue}
-              onChange={(e) => setRevenue(parseFloat(e.target.value))}
+              value={formatInputValue(revenue, currency)}
+              onChange={(e) => setRevenue(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              COGS ($)
+              COGS ({currency})
             </label>
             <input
               type="number"
-              value={cogs}
-              onChange={(e) => setCogs(parseFloat(e.target.value))}
+              value={formatInputValue(cogs, currency)}
+              onChange={(e) => setCogs(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Operating Costs ($)
+              Operating Costs ({currency})
             </label>
             <input
               type="number"
-              value={operatingCosts}
-              onChange={(e) => setOperatingCosts(parseFloat(e.target.value))}
+              value={formatInputValue(operatingCosts, currency)}
+              onChange={(e) => setOperatingCosts(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -78,7 +92,7 @@ export default function MarketingROICalculator() {
             <div className="bg-blue-100 p-4 rounded-lg mb-4">
               <p className="text-sm text-gray-700 mb-1">ROAS (Return on Ad Spend)</p>
               <p className="text-3xl font-bold text-blue-600">{roas}:1</p>
-              <p className="text-xs text-gray-600 mt-1">For every $1 spent on ads, you earn ${roas}</p>
+              <p className="text-xs text-gray-600 mt-1">For every {formatCurrency(1, currency)} spent on ads, you earn {roas}x that amount</p>
             </div>
 
             <div className="bg-green-100 p-4 rounded-lg mb-4">
@@ -89,7 +103,7 @@ export default function MarketingROICalculator() {
 
             <div className="bg-purple-100 p-4 rounded-lg mb-4">
               <p className="text-sm text-gray-700 mb-1">Net Profit</p>
-              <p className="text-3xl font-bold text-purple-600">${profit.toFixed(2)}</p>
+              <p className="text-3xl font-bold text-purple-600">{formatCurrency(profit, currency)}</p>
               <p className="text-xs text-gray-600 mt-1">After all costs and ad spend</p>
             </div>
 

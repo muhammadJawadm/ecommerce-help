@@ -1,37 +1,52 @@
 import { useState } from 'react'
 import Calculator from '../../components/Calculator'
+import { useCurrency } from '../../context/CurrencyContext'
 
 export default function ProfitMarginCalculator() {
   const [revenue, setRevenue] = useState(1000)
   const [cogs, setCogs] = useState(400)
   const [operatingExpenses, setOperatingExpenses] = useState(200)
   const [taxes, setTaxes] = useState(100)
+  const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
-  const grossProfit = revenue - cogs
-  const grossMargin = ((grossProfit / revenue) * 100).toFixed(2)
+  const revenueAmount = revenue ?? 0
+  const cogsAmount = cogs ?? 0
+  const operatingAmount = operatingExpenses ?? 0
+  const taxAmount = taxes ?? 0
+
+  const grossProfit = revenueAmount - cogsAmount
+  const grossMargin = revenueAmount ? ((grossProfit / revenueAmount) * 100).toFixed(2) : '0.00'
   
-  const operatingProfit = grossProfit - operatingExpenses
-  const operatingMargin = ((operatingProfit / revenue) * 100).toFixed(2)
+  const operatingProfit = grossProfit - operatingAmount
+  const operatingMargin = revenueAmount ? ((operatingProfit / revenueAmount) * 100).toFixed(2) : '0.00'
   
-  const netProfit = operatingProfit - taxes
-  const netMargin = ((netProfit / revenue) * 100).toFixed(2)
+  const netProfit = operatingProfit - taxAmount
+  const netMargin = revenueAmount ? ((netProfit / revenueAmount) * 100).toFixed(2) : '0.00'
+
+  const clearForm = () => {
+    setRevenue(null)
+    setCogs(null)
+    setOperatingExpenses(null)
+    setTaxes(null)
+  }
 
   return (
     <Calculator
       title="Profit Margin Calculator"
       description="Calculate gross, operating, and net profit margins with complete breakdown"
+      onClear={clearForm}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Input Section */}
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Total Revenue ($)
+              Total Revenue ({currency})
             </label>
             <input
               type="number"
-              value={revenue}
-              onChange={(e) => setRevenue(parseFloat(e.target.value))}
+              value={formatInputValue(revenue, currency)}
+              onChange={(e) => setRevenue(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -42,8 +57,8 @@ export default function ProfitMarginCalculator() {
             </label>
             <input
               type="number"
-              value={cogs}
-              onChange={(e) => setCogs(parseFloat(e.target.value))}
+              value={formatInputValue(cogs, currency)}
+              onChange={(e) => setCogs(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -54,8 +69,8 @@ export default function ProfitMarginCalculator() {
             </label>
             <input
               type="number"
-              value={operatingExpenses}
-              onChange={(e) => setOperatingExpenses(parseFloat(e.target.value))}
+                value={formatInputValue(operatingExpenses, currency)}
+                onChange={(e) => setOperatingExpenses(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -66,8 +81,8 @@ export default function ProfitMarginCalculator() {
             </label>
             <input
               type="number"
-              value={taxes}
-              onChange={(e) => setTaxes(parseFloat(e.target.value))}
+              value={formatInputValue(taxes, currency)}
+              onChange={(e) => setTaxes(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -80,13 +95,13 @@ export default function ProfitMarginCalculator() {
           <div className="space-y-4">
             <div className="flex justify-between items-center pb-3 border-b-2 border-blue-300">
               <span className="text-gray-700 font-semibold">Revenue</span>
-              <span className="text-2xl font-bold text-blue-600">${revenue.toFixed(2)}</span>
+              <span className="text-2xl font-bold text-blue-600">{formatCurrency(revenueAmount, currency)}</span>
             </div>
 
             <div className="mt-4 p-4 bg-white rounded-lg border-l-4 border-green-500">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-gray-700 font-semibold">Gross Profit</span>
-                <span className="text-xl font-bold text-green-600">${grossProfit.toFixed(2)}</span>
+                <span className="text-xl font-bold text-green-600">{formatCurrency(grossProfit, currency)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm">Gross Margin</span>
@@ -98,7 +113,7 @@ export default function ProfitMarginCalculator() {
             <div className="p-4 bg-white rounded-lg border-l-4 border-yellow-500">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-gray-700 font-semibold">Operating Profit</span>
-                <span className="text-xl font-bold text-yellow-600">${operatingProfit.toFixed(2)}</span>
+                <span className="text-xl font-bold text-yellow-600">{formatCurrency(operatingProfit, currency)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm">Operating Margin</span>
@@ -110,7 +125,7 @@ export default function ProfitMarginCalculator() {
             <div className="p-4 bg-white rounded-lg border-l-4 border-blue-500">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-gray-700 font-semibold">Net Profit</span>
-                <span className="text-xl font-bold text-blue-600">${netProfit.toFixed(2)}</span>
+                <span className="text-xl font-bold text-blue-600">{formatCurrency(netProfit, currency)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm">Net Margin</span>

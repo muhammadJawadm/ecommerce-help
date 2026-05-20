@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Package, ShoppingCart, TrendingUp, DollarSign, Zap, BarChart3, Truck, Target, PieChart, Calculator } from 'lucide-react'
+import { Package, ShoppingCart, TrendingUp, DollarSign, Zap, BarChart3, Truck, Target, PieChart, Store, Factory } from 'lucide-react'
 
 export default function AllCalculators() {
   const calculators = [
@@ -72,6 +72,20 @@ export default function AllCalculators() {
       description: 'Calculate return on investment for marketing campaigns',
       category: 'Marketing',
       link: '/calculator/marketing-roi'
+    },
+    {
+      icon: Store,
+      title: 'WooCommerce Profit Calculator',
+      description: 'Calculate WooCommerce profits and plugin costs',
+      category: 'Ecommerce',
+      link: '/calculator/woocommerce-profit'
+    },
+    {
+      icon: Factory,
+      title: 'Amazon White Label Calculator',
+      description: 'Calculate private label Amazon product profitability',
+      category: 'Ecommerce',
+      link: '/calculator/amazon-white-label'
     },
   ]
 

@@ -42,6 +42,7 @@
 .navbar-menu-desktop {
   display: none;
   gap: 0.5rem;
+  align-items: center;
 }
 
 @media (min-width: 768px) {
@@ -60,6 +61,25 @@
 
 .navbar-link:hover {
   background-color: var(--code-bg);
+}
+
+.currency-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.currency-switcher select {
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: var(--bg);
+  color: var(--text-h);
+  padding: 0.4rem 0.7rem;
+  font: inherit;
 }
 
 .navbar-toggle {
@@ -102,4 +122,13 @@
 
 .navbar-link-mobile:hover {
   background-color: var(--code-bg);
+}
+
+.currency-switcher-mobile {
+  margin: 0.5rem 1rem 1rem;
+  justify-content: space-between;
+}
+
+.currency-switcher-mobile select {
+  width: 8rem;
 }

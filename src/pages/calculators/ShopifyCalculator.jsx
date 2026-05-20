@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Calculator from '../../components/Calculator'
+import { useCurrency } from '../../context/CurrencyContext'
 
 export default function ShopifyCalculator() {
   const [revenue, setRevenue] = useState(5000)
@@ -7,6 +8,12 @@ export default function ShopifyCalculator() {
   const [shopifyPlan, setShopifyPlan] = useState('basic')
   const [appsMonthly, setAppsMonthly] = useState(150)
   const [adSpend, setAdSpend] = useState(1000)
+  const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
+
+  const revenueAmount = revenue ?? 0
+  const cogsAmount = cogs ?? 0
+  const appsAmount = appsMonthly ?? 0
+  const adSpendAmount = adSpend ?? 0
 
   const planCosts = {
     basic: 29,
@@ -14,28 +21,36 @@ export default function ShopifyCalculator() {
     advanced: 2299
   }
 
-  const paymentFee = revenue * 0.029 + revenue * 0.30 / 100
-  const totalCosts = cogs + planCosts[shopifyPlan] + appsMonthly + adSpend + paymentFee
-  const profit = revenue - totalCosts
-  const profitMargin = ((profit / revenue) * 100).toFixed(2)
-  const breakEvenRevenue = totalCosts / (1 - (profit / revenue))
+  const paymentFee = revenueAmount * 0.029 + 0.3
+  const totalCosts = cogsAmount + planCosts[shopifyPlan] + appsAmount + adSpendAmount + paymentFee
+  const profit = revenueAmount - totalCosts
+  const profitMargin = revenueAmount ? ((profit / revenueAmount) * 100).toFixed(2) : '0.00'
+
+  const clearForm = () => {
+    setRevenue(null)
+    setCogs(null)
+    setShopifyPlan('basic')
+    setAppsMonthly(null)
+    setAdSpend(null)
+  }
 
   return (
     <Calculator
       title="Shopify Profit Calculator"
       description="Calculate your Shopify store profitability with all expenses"
+      onClear={clearForm}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Input Section */}
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Monthly Revenue ($)
+              Monthly Revenue ({currency})
             </label>
             <input
               type="number"
-              value={revenue}
-              onChange={(e) => setRevenue(parseFloat(e.target.value))}
+              value={formatInputValue(revenue, currency)}
+              onChange={(e) => setRevenue(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -46,8 +61,8 @@ export default function ShopifyCalculator() {
             </label>
             <input
               type="number"
-              value={cogs}
-              onChange={(e) => setCogs(parseFloat(e.target.value))}
+              value={formatInputValue(cogs, currency)}
+              onChange={(e) => setCogs(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -73,20 +88,20 @@ export default function ShopifyCalculator() {
             </label>
             <input
               type="number"
-              value={appsMonthly}
-              onChange={(e) => setAppsMonthly(parseFloat(e.target.value))}
+              value={formatInputValue(appsMonthly, currency)}
+              onChange={(e) => setAppsMonthly(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Monthly Ad Spend ($)
+              Monthly Ad Spend ({currency})
             </label>
             <input
               type="number"
-              value={adSpend}
-              onChange={(e) => setAdSpend(parseFloat(e.target.value))}
+              value={formatInputValue(adSpend, currency)}
+              onChange={(e) => setAdSpend(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -99,44 +114,44 @@ export default function ShopifyCalculator() {
           <div className="space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Revenue</span>
-              <span className="font-bold">${revenue.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(revenueAmount, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">COGS</span>
-              <span className="font-bold">${cogs.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(cogsAmount, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Shopify Plan</span>
-              <span className="font-bold">${planCosts[shopifyPlan].toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(planCosts[shopifyPlan], currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Payment Processing (2.9% + $0.30)</span>
-              <span className="font-bold">${paymentFee.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(paymentFee, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Apps & Subscriptions</span>
-              <span className="font-bold">${appsMonthly.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(appsAmount, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Ad Spend</span>
-              <span className="font-bold">${adSpend.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(adSpendAmount, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Total Expenses</span>
-              <span className="font-bold text-red-600">${totalCosts.toFixed(2)}</span>
+              <span className="font-bold text-red-600">{formatCurrency(totalCosts, currency)}</span>
             </div>
 
             <div className="pt-4 mt-4 border-t-2 border-blue-300">
               <div className="bg-green-100 p-4 rounded-lg mb-4">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-900 font-bold">Net Profit</span>
-                  <span className="text-2xl font-bold text-green-600">${profit.toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-green-600">{formatCurrency(profit, currency)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-900 font-bold">Profit Margin</span>

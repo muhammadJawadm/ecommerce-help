@@ -10,7 +10,7 @@ export default function Footer() {
           <div className="footer-section">
             <div className="footer-brand">
               <div className="footer-icon">📊</div>
-              <span>EcomCalc</span>
+              <span>iLoveProfit</span>
             </div>
             <p className="footer-description">
               Free ecommerce calculator tools for Shopify, Amazon FBA, eBay, Etsy, and more.
@@ -52,7 +52,7 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <p>
-            © 2026 EcomCalc. All rights reserved. Free • No Signup • Real-time Results
+            © 2026 iLoveProfit. All rights reserved. Free • No Signup • Real-time Results
           </p>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Package, ShoppingCart, TrendingUp, DollarSign, Zap, BarChart3 } from 'lucide-react'
+import { Package, ShoppingCart, TrendingUp, DollarSign, Zap, BarChart3, HelpCircle, Store, Factory } from 'lucide-react'
 
 export default function Home() {
   const features = [
@@ -38,6 +38,24 @@ export default function Home() {
       title: 'ROAS Calculator',
       description: 'Find your break-even ROAS for advertising',
       link: '/calculator/break-even-roas'
+    },
+    {
+      icon: Store,
+      title: 'WooCommerce Profit',
+      description: 'Calculate WooCommerce store profit after fees and ads',
+      link: '/calculator/woocommerce-profit'
+    },
+    {
+      icon: Factory,
+      title: 'Amazon White Label',
+      description: 'Model margins for private label and white label Amazon products',
+      link: '/calculator/amazon-white-label'
+    },
+    {
+      icon: HelpCircle,
+      title: 'Support Center',
+      description: 'Send a request to the help desk with your calculator questions',
+      link: '/support'
     },
   ]
 

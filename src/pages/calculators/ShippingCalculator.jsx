@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import Calculator from '../../components/Calculator'
+import { useCurrency } from '../../context/CurrencyContext'
 
 export default function ShippingCalculator() {
   const [weight, setWeight] = useState(1)
   const [zipCode, setZipCode] = useState('10001')
   const [carrier, setCarrier] = useState('usps')
+  const { currency, formatCurrency } = useCurrency()
 
   // Simplified shipping rates (2026)
   const shippingRates = {
@@ -62,10 +64,17 @@ export default function ShippingCalculator() {
   const rate = getRate(weight)
   const estimatedDelivery = carrier === 'usps' ? '5-7 business days' : '2-3 business days'
 
+  const clearForm = () => {
+    setWeight(null)
+    setZipCode('')
+    setCarrier('usps')
+  }
+
   return (
     <Calculator
       title="Shipping Cost Calculator"
       description="Compare shipping costs across USPS, UPS, FedEx, and DHL"
+      onClear={clearForm}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Input Section */}
@@ -76,8 +85,8 @@ export default function ShippingCalculator() {
             </label>
             <input
               type="number"
-              value={weight}
-              onChange={(e) => setWeight(parseFloat(e.target.value))}
+              value={weight ?? ''}
+              onChange={(e) => setWeight(e.target.value === '' ? null : parseFloat(e.target.value))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -129,7 +138,7 @@ export default function ShippingCalculator() {
             <div className="bg-white p-4 rounded-lg my-4">
               <div className="flex justify-between items-center mb-3">
                 <span className="text-gray-700 font-semibold">Estimated Shipping Cost</span>
-                <span className="text-3xl font-bold text-green-600">${rate.toFixed(2)}</span>
+                <span className="text-3xl font-bold text-green-600">{formatCurrency(rate, currency)}</span>
               </div>
               <p className="text-gray-600 text-sm">For shipment to zip {zipCode}</p>
             </div>

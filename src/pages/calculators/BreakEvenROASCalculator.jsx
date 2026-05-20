@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Calculator from '../../components/Calculator'
+import { useCurrency } from '../../context/CurrencyContext'
 
 export default function BreakEvenROASCalculator() {
   const [salePrice, setSalePrice] = useState(50)
@@ -9,47 +10,67 @@ export default function BreakEvenROASCalculator() {
   const [shippingCost, setShippingCost] = useState(5)
   const [returnRate, setReturnRate] = useState(0.10)
   const [appCostPerUnit, setAppCostPerUnit] = useState(0.50)
+  const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
-  const platformFee = salePrice * platformFeePercent
-  const paymentFee = salePrice * paymentFeePercent
-  const returnCost = salePrice * returnRate
-  const totalCostsBeforeAds = cogs + platformFee + paymentFee + shippingCost + returnCost + appCostPerUnit
+  const sale = salePrice ?? 0
+  const cost = cogs ?? 0
+  const shipping = shippingCost ?? 0
+  const appCost = appCostPerUnit ?? 0
+  const platformFeeRate = platformFeePercent ?? 0
+  const paymentFeeRate = paymentFeePercent ?? 0
+  const returnRateValue = returnRate ?? 0
 
-  const breakEvenROAS = (totalCostsBeforeAds / salePrice).toFixed(2)
-  const allowableCAC = (salePrice - totalCostsBeforeAds).toFixed(2)
+  const platformFee = sale * platformFeeRate
+  const paymentFee = sale * paymentFeeRate
+  const returnCost = sale * returnRateValue
+  const totalCostsBeforeAds = cost + platformFee + paymentFee + shipping + returnCost + appCost
+
+  const breakEvenROAS = sale ? (totalCostsBeforeAds / sale).toFixed(2) : '0.00'
+  const allowableCAC = sale - totalCostsBeforeAds
   
   // Recommended ROAS for profitability
-  const recommendedROAS = (breakEvenROAS * 1.5).toFixed(2)
-  const profitAtRecommendedROAS = (salePrice - totalCostsBeforeAds - (salePrice / recommendedROAS)).toFixed(2)
+  const recommendedROAS = Number(breakEvenROAS) * 1.5
+  const profitAtRecommendedROAS = sale - totalCostsBeforeAds - (sale && recommendedROAS ? (sale / recommendedROAS) : 0)
+
+  const clearForm = () => {
+    setSalePrice(null)
+    setCogs(null)
+    setPlatformFeePercent(null)
+    setPaymentFeePercent(null)
+    setShippingCost(null)
+    setReturnRate(null)
+    setAppCostPerUnit(null)
+  }
 
   return (
     <Calculator
       title="Break-Even ROAS Calculator"
       description="Find your true break-even ROAS including all hidden costs and fees"
+      onClear={clearForm}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Input Section */}
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Sale Price ($)
+              Sale Price ({currency})
             </label>
             <input
               type="number"
-              value={salePrice}
-              onChange={(e) => setSalePrice(parseFloat(e.target.value))}
+              value={formatInputValue(salePrice, currency)}
+              onChange={(e) => setSalePrice(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              COGS ($)
+              COGS ({currency})
             </label>
             <input
               type="number"
-              value={cogs}
-              onChange={(e) => setCogs(parseFloat(e.target.value))}
+              value={formatInputValue(cogs, currency)}
+              onChange={(e) => setCogs(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -60,8 +81,8 @@ export default function BreakEvenROASCalculator() {
             </label>
             <input
               type="number"
-              value={platformFeePercent * 100}
-              onChange={(e) => setPlatformFeePercent(parseFloat(e.target.value) / 100)}
+              value={platformFeeRate * 100}
+              onChange={(e) => setPlatformFeePercent(e.target.value === '' ? null : parseFloat(e.target.value) / 100)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -72,20 +93,20 @@ export default function BreakEvenROASCalculator() {
             </label>
             <input
               type="number"
-              value={paymentFeePercent * 100}
-              onChange={(e) => setPaymentFeePercent(parseFloat(e.target.value) / 100)}
+              value={paymentFeeRate * 100}
+              onChange={(e) => setPaymentFeePercent(e.target.value === '' ? null : parseFloat(e.target.value) / 100)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Shipping Cost ($)
+              Shipping Cost ({currency})
             </label>
             <input
               type="number"
-              value={shippingCost}
-              onChange={(e) => setShippingCost(parseFloat(e.target.value))}
+              value={formatInputValue(shippingCost, currency)}
+              onChange={(e) => setShippingCost(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -96,20 +117,20 @@ export default function BreakEvenROASCalculator() {
             </label>
             <input
               type="number"
-              value={returnRate * 100}
-              onChange={(e) => setReturnRate(parseFloat(e.target.value) / 100)}
+              value={returnRateValue * 100}
+              onChange={(e) => setReturnRate(e.target.value === '' ? null : parseFloat(e.target.value) / 100)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              App Cost Per Unit ($)
+              App Cost Per Unit ({currency})
             </label>
             <input
               type="number"
-              value={appCostPerUnit}
-              onChange={(e) => setAppCostPerUnit(parseFloat(e.target.value))}
+              value={formatInputValue(appCostPerUnit, currency)}
+              onChange={(e) => setAppCostPerUnit(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -122,50 +143,50 @@ export default function BreakEvenROASCalculator() {
           <div className="space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">COGS</span>
-              <span className="font-bold">${cogs.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(cost, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Platform Fee</span>
-              <span className="font-bold">${platformFee.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(platformFee, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Payment Fee</span>
-              <span className="font-bold">${paymentFee.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(paymentFee, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Shipping</span>
-              <span className="font-bold">${shippingCost.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(shipping, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Return Cost Loss</span>
-              <span className="font-bold">${returnCost.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(returnCost, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">App Costs</span>
-              <span className="font-bold">${appCostPerUnit.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(appCost, currency)}</span>
             </div>
 
             <div className="pt-4 mt-4 border-t-2 border-blue-300">
               <div className="bg-red-100 p-4 rounded-lg mb-4">
                 <p className="text-sm text-gray-700 mb-2">Break-Even ROAS</p>
                 <p className="text-3xl font-bold text-red-600">{breakEvenROAS}x</p>
-                <p className="text-xs text-gray-600 mt-2">You must earn ${breakEvenROAS} for every $1 spent on ads just to break even</p>
+                <p className="text-xs text-gray-600 mt-2">You must earn {breakEvenROAS}x revenue for every {formatCurrency(1, currency)} spent on ads just to break even</p>
               </div>
 
               <div className="bg-yellow-100 p-4 rounded-lg mb-4">
                 <p className="text-sm text-gray-700 mb-2">Recommended ROAS (50% Margin)</p>
-                <p className="text-3xl font-bold text-yellow-700">{recommendedROAS}x</p>
-                <p className="text-xs text-gray-600 mt-2">Profit at this ROAS: ${profitAtRecommendedROAS}</p>
+                <p className="text-3xl font-bold text-yellow-700">{recommendedROAS.toFixed(2)}x</p>
+                <p className="text-xs text-gray-600 mt-2">Profit at this ROAS: {formatCurrency(profitAtRecommendedROAS, currency)}</p>
               </div>
 
               <div className="bg-green-100 p-4 rounded-lg">
                 <p className="text-sm text-gray-700 mb-2">Allowable CAC Per Unit</p>
-                <p className="text-2xl font-bold text-green-600">${allowableCAC}</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(allowableCAC, currency)}</p>
                 <p className="text-xs text-gray-600 mt-2">Max you can spend per customer to break even</p>
               </div>
             </div>

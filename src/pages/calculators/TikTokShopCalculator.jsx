@@ -1,11 +1,16 @@
 import { useState } from 'react'
 import Calculator from '../../components/Calculator'
+import { useCurrency } from '../../context/CurrencyContext'
 
 export default function TikTokShopCalculator() {
   const [salePrice, setSalePrice] = useState(50)
   const [cogs, setCogs] = useState(12)
   const [category, setCategory] = useState('general')
   const [isCreatorContent, setIsCreatorContent] = useState(false)
+  const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
+
+  const sale = salePrice ?? 0
+  const cost = cogs ?? 0
 
   const categoryCommissions = {
     general: 0.05,
@@ -15,41 +20,49 @@ export default function TikTokShopCalculator() {
     home: 0.05
   }
 
-  const sellerFee = salePrice * categoryCommissions[category]
-  const paymentProcessingFee = salePrice * 0.035 + 0.30
-  const creatorCommission = isCreatorContent ? salePrice * 0.15 : 0
+  const sellerFee = sale * categoryCommissions[category]
+  const paymentProcessingFee = sale * 0.035 + 0.3
+  const creatorCommission = isCreatorContent ? sale * 0.15 : 0
   const totalFees = sellerFee + paymentProcessingFee + creatorCommission
-  const profit = salePrice - cogs - totalFees
-  const profitMargin = ((profit / salePrice) * 100).toFixed(2)
+  const profit = sale - cost - totalFees
+  const profitMargin = sale ? ((profit / sale) * 100).toFixed(2) : '0.00'
+
+  const clearForm = () => {
+    setSalePrice(null)
+    setCogs(null)
+    setCategory('general')
+    setIsCreatorContent(false)
+  }
 
   return (
     <Calculator
       title="TikTok Shop Fee Calculator"
       description="Calculate TikTok Shop seller fees, commissions, and profit margins"
+      onClear={clearForm}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Input Section */}
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Sale Price ($)
+              Sale Price ({currency})
             </label>
             <input
               type="number"
-              value={salePrice}
-              onChange={(e) => setSalePrice(parseFloat(e.target.value))}
+              value={formatInputValue(salePrice, currency)}
+              onChange={(e) => setSalePrice(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Cost / COGS ($)
+              Cost / COGS ({currency})
             </label>
             <input
               type="number"
-              value={cogs}
-              onChange={(e) => setCogs(parseFloat(e.target.value))}
+              value={formatInputValue(cogs, currency)}
+              onChange={(e) => setCogs(parseCurrencyInput(e.target.value, currency))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -92,36 +105,36 @@ export default function TikTokShopCalculator() {
           <div className="space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Seller Fee ({(categoryCommissions[category] * 100).toFixed(0)}%)</span>
-              <span className="font-bold">${sellerFee.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(sellerFee, currency)}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Payment Processing (3.5% + $0.30)</span>
-              <span className="font-bold">${paymentProcessingFee.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(paymentProcessingFee, currency)}</span>
             </div>
 
             {isCreatorContent && (
               <div className="flex justify-between items-center pb-2 border-b border-blue-200">
                 <span className="text-gray-700">Creator Commission (15%)</span>
-                <span className="font-bold">${creatorCommission.toFixed(2)}</span>
+                <span className="font-bold">{formatCurrency(creatorCommission, currency)}</span>
               </div>
             )}
 
             <div className="flex justify-between items-center pb-2 border-b border-blue-200">
               <span className="text-gray-700">Total Fees</span>
-              <span className="font-bold text-red-600">${totalFees.toFixed(2)}</span>
+              <span className="font-bold text-red-600">{formatCurrency(totalFees, currency)}</span>
             </div>
 
             <div className="pt-4 mt-4 border-t-2 border-blue-300">
               <div className="flex justify-between items-center mb-2 pb-2 border-b border-blue-200">
                 <span className="text-gray-700">COGS</span>
-                <span>${cogs.toFixed(2)}</span>
+                <span>{formatCurrency(cost, currency)}</span>
               </div>
 
               <div className="bg-green-100 p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-900 font-bold">Net Profit</span>
-                  <span className="text-2xl font-bold text-green-600">${profit.toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-green-600">{formatCurrency(profit, currency)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-900 font-bold">Profit Margin</span>

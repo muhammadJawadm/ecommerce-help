@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+@media print {
+	.navbar,
+	.footer,
+	.calculator-actions,
+	button,
+	a[href="/support"] {
+		display: none !important;
+	}
+
+	body {
+		background: #ffffff !important;
+	}
+
+	.calculator-page {
+		padding: 0 !important;
+		background: #ffffff !important;
+	}
+
+	.calculator-page .shadow-lg,
+	.calculator-page .rounded-lg {
+		box-shadow: none !important;
+	}
+}
