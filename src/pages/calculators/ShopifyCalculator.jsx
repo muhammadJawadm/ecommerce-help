@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import Calculator from '../../components/Calculator'
 import { useCurrency } from '../../context/CurrencyContext'
+import { ShoppingCart } from 'lucide-react'
+
+const planCosts = { basic: 29, shopify: 299, advanced: 2299 }
 
 export default function ShopifyCalculator() {
   const [revenue, setRevenue] = useState(5000)
@@ -10,172 +13,91 @@ export default function ShopifyCalculator() {
   const [adSpend, setAdSpend] = useState(1000)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
-  const revenueAmount = revenue ?? 0
-  const cogsAmount = cogs ?? 0
-  const appsAmount = appsMonthly ?? 0
-  const adSpendAmount = adSpend ?? 0
+  const rev = revenue || 0
+  const cost = cogs || 0
+  const apps = appsMonthly || 0
+  const ads = adSpend || 0
+  const planFee = planCosts[shopifyPlan]
+  const paymentFee = rev * 0.029 + 0.3
+  const totalCosts = cost + planFee + apps + ads + paymentFee
+  const profit = rev - totalCosts
+  const profitMargin = rev ? ((profit / rev) * 100).toFixed(2) : '0.00'
+  const isProfit = profit >= 0
 
-  const planCosts = {
-    basic: 29,
-    shopify: 299,
-    advanced: 2299
-  }
+  const clearForm = () => { setRevenue(5000); setCogs(1500); setShopifyPlan('basic'); setAppsMonthly(150); setAdSpend(1000) }
 
-  const paymentFee = revenueAmount * 0.029 + 0.3
-  const totalCosts = cogsAmount + planCosts[shopifyPlan] + appsAmount + adSpendAmount + paymentFee
-  const profit = revenueAmount - totalCosts
-  const profitMargin = revenueAmount ? ((profit / revenueAmount) * 100).toFixed(2) : '0.00'
-
-  const clearForm = () => {
-    setRevenue(null)
-    setCogs(null)
-    setShopifyPlan('basic')
-    setAppsMonthly(null)
-    setAdSpend(null)
-  }
+  const row = (label, value, red = false) => (
+    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }}>
+      <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{label}</span>
+      <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: red ? '#ef4444' : '#0f172a' }}>{value}</span>
+    </div>
+  )
 
   return (
-    <Calculator
-      title="Shopify Profit Calculator"
-      description="Calculate your Shopify store profitability with all expenses"
-      onClear={clearForm}
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Input Section */}
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Monthly Revenue ({currency})
-            </label>
-            <input
-              type="number"
-              value={formatInputValue(revenue, currency)}
-              onChange={(e) => setRevenue(parseCurrencyInput(e.target.value, currency))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              COGS (Cost of Goods Sold)
-            </label>
-            <input
-              type="number"
-              value={formatInputValue(cogs, currency)}
-              onChange={(e) => setCogs(parseCurrencyInput(e.target.value, currency))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Shopify Plan
-            </label>
-            <select
-              value={shopifyPlan}
-              onChange={(e) => setShopifyPlan(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="basic">Basic - $29/month</option>
-              <option value="shopify">Shopify - $299/month</option>
-              <option value="advanced">Advanced - $2,299/month</option>
+    <Calculator title="Shopify Profit Calculator" description="Calculate monthly store profitability including platform, payment, and ad costs." icon={ShoppingCart} iconColor="emerald" onClear={clearForm}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+        <div className="calc-panel">
+          <h2>Store Details</h2>
+          {[
+            { label: `Monthly Revenue (${currency})`, val: revenue, set: setRevenue },
+            { label: `COGS (${currency})`, val: cogs, set: setCogs },
+            { label: `Monthly App Subscriptions (${currency})`, val: appsMonthly, set: setAppsMonthly },
+            { label: `Monthly Ad Spend (${currency})`, val: adSpend, set: setAdSpend },
+          ].map(({ label, val, set }) => (
+            <div key={label} style={{ marginBottom: '1rem' }}>
+              <label className="form-label">{label}</label>
+              <input type="number" className="form-input" value={formatInputValue(val, currency)} onChange={e => set(parseCurrencyInput(e.target.value, currency))} min="0" step="0.01" />
+            </div>
+          ))}
+          <div style={{ marginBottom: '1rem' }}>
+            <label className="form-label">Shopify Plan</label>
+            <select className="form-input" value={shopifyPlan} onChange={e => setShopifyPlan(e.target.value)} style={{ cursor: 'pointer' }}>
+              <option value="basic">Basic — $29/month</option>
+              <option value="shopify">Shopify — $299/month</option>
+              <option value="advanced">Advanced — $2,299/month</option>
             </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Monthly App Subscriptions ($)
-            </label>
-            <input
-              type="number"
-              value={formatInputValue(appsMonthly, currency)}
-              onChange={(e) => setAppsMonthly(parseCurrencyInput(e.target.value, currency))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Monthly Ad Spend ({currency})
-            </label>
-            <input
-              type="number"
-              value={formatInputValue(adSpend, currency)}
-              onChange={(e) => setAdSpend(parseCurrencyInput(e.target.value, currency))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
           </div>
         </div>
 
-        {/* Results Section */}
-        <div className="bg-blue-50 p-8 rounded-lg">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">Profit Analysis</h3>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Revenue</span>
-              <span className="font-bold">{formatCurrency(revenueAmount, currency)}</span>
-            </div>
+        <div className="calc-panel">
+          <h2>Profit Analysis</h2>
+          {row(`Revenue`, formatCurrency(rev, currency))}
+          {row(`COGS`, formatCurrency(cost, currency), true)}
+          {row(`Shopify Plan`, formatCurrency(planFee, currency), true)}
+          {row(`Payment Processing (2.9% + $0.30)`, formatCurrency(paymentFee, currency), true)}
+          {row(`Apps & Subscriptions`, formatCurrency(apps, currency), true)}
+          {row(`Ad Spend`, formatCurrency(ads, currency), true)}
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.625rem 0', borderBottom: '1.5px solid #e2e8f0', marginBottom: '1.25rem' }}>
+            <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#64748b' }}>Total Expenses</span>
+            <span style={{ fontWeight: 800, color: '#ef4444' }}>{formatCurrency(totalCosts, currency)}</span>
+          </div>
 
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">COGS</span>
-              <span className="font-bold">{formatCurrency(cogsAmount, currency)}</span>
+          <div style={{
+            background: isProfit ? '#ecfdf5' : '#fef2f2',
+            border: `1px solid ${isProfit ? '#6ee7b7' : '#fca5a5'}`,
+            borderRadius: 12, padding: '1.125rem', marginBottom: '0.75rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span style={{ fontWeight: 700 }}>Net Profit</span>
+              <span style={{ fontSize: '1.375rem', fontWeight: 800, color: isProfit ? '#059669' : '#dc2626' }}>{formatCurrency(profit, currency)}</span>
             </div>
-
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Shopify Plan</span>
-              <span className="font-bold">{formatCurrency(planCosts[shopifyPlan], currency)}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontWeight: 700 }}>Profit Margin</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 800, color: isProfit ? '#059669' : '#dc2626' }}>{profitMargin}%</span>
             </div>
-
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Payment Processing (2.9% + $0.30)</span>
-              <span className="font-bold">{formatCurrency(paymentFee, currency)}</span>
-            </div>
-
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Apps & Subscriptions</span>
-              <span className="font-bold">{formatCurrency(appsAmount, currency)}</span>
-            </div>
-
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Ad Spend</span>
-              <span className="font-bold">{formatCurrency(adSpendAmount, currency)}</span>
-            </div>
-
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Total Expenses</span>
-              <span className="font-bold text-red-600">{formatCurrency(totalCosts, currency)}</span>
-            </div>
-
-            <div className="pt-4 mt-4 border-t-2 border-blue-300">
-              <div className="bg-green-100 p-4 rounded-lg mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-900 font-bold">Net Profit</span>
-                  <span className="text-2xl font-bold text-green-600">{formatCurrency(profit, currency)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-900 font-bold">Profit Margin</span>
-                  <span className="text-xl font-bold text-green-600">{profitMargin}%</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <p className="text-sm text-gray-700">A healthy ecommerce margin is typically 20-40% depending on your niche.</p>
-              </div>
-            </div>
+          </div>
+          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '0.75rem 1rem', fontSize: '0.875rem', color: '#065f46' }}>
+            A healthy ecommerce margin is typically 20–40% depending on niche.
           </div>
         </div>
       </div>
 
-      <div className="mt-12 p-6 bg-gray-100 rounded-lg">
-        <h3 className="text-lg font-bold mb-4">📊 Shopify Profitability Tips</h3>
-        <ul className="space-y-2 text-gray-700">
-          <li>• Shopify charges 2.9% + 30¢ per transaction on Basic plan (lower on higher tiers)</li>
-          <li>• Use Shopify Payments to avoid additional gateway fees</li>
-          <li>• Monitor app subscriptions - they add up quickly</li>
-          <li>• Higher plans offer better rates but start at $299/month</li>
-          <li>• Factor in email marketing, shipping, and customer service costs</li>
-          <li>• Aim for 3:1 ROAS (for every $1 spent on ads, earn $3 in revenue)</li>
+      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '1.25rem 1.5rem', marginTop: '1.25rem' }}>
+        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.75rem' }}>Shopify Profitability Tips</h3>
+        <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', color: '#475569', fontSize: '0.875rem' }}>
+          {['Use Shopify Payments to avoid third-party gateway fees.', 'Higher plans offer lower transaction rates — worth it above ~$10K/month.', 'Audit app subscriptions quarterly — they add up fast.', 'Target a 3:1 ROAS (earn $3 for every $1 in ads).', 'Factor in email marketing, packaging, and customer service costs.'].map(t => (
+            <li key={t} style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#10b981', flexShrink: 0 }}>✓</span>{t}</li>
+          ))}
         </ul>
       </div>
     </Calculator>

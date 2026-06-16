@@ -1,103 +1,88 @@
 import { useState } from 'react'
 import Calculator from '../../components/Calculator'
 import { useCurrency } from '../../context/CurrencyContext'
-
-const initialState = {
-  revenue: 5000,
-  cogs: 1800,
-  hosting: 30,
-  pluginCosts: 90,
-  adSpend: 800,
-}
+import { Store } from 'lucide-react'
 
 export default function WooCommerceCalculator() {
-  const [revenue, setRevenue] = useState(initialState.revenue)
-  const [cogs, setCogs] = useState(initialState.cogs)
-  const [hosting, setHosting] = useState(initialState.hosting)
-  const [pluginCosts, setPluginCosts] = useState(initialState.pluginCosts)
-  const [adSpend, setAdSpend] = useState(initialState.adSpend)
+  const [revenue, setRevenue] = useState(5000)
+  const [cogs, setCogs] = useState(1800)
+  const [hosting, setHosting] = useState(30)
+  const [pluginCosts, setPluginCosts] = useState(90)
+  const [adSpend, setAdSpend] = useState(800)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
-  const revenueAmount = revenue ?? 0
-  const cogsAmount = cogs ?? 0
-  const hostingAmount = hosting ?? 0
-  const pluginAmount = pluginCosts ?? 0
-  const adSpendAmount = adSpend ?? 0
+  const rev = revenue || 0
+  const cost = cogs || 0
+  const host = hosting || 0
+  const plugins = pluginCosts || 0
+  const ads = adSpend || 0
+  const paymentFee = rev * 0.029 + 0.3
+  const totalCosts = cost + host + plugins + ads + paymentFee
+  const profit = rev - totalCosts
+  const profitMargin = rev ? ((profit / rev) * 100).toFixed(2) : '0.00'
+  const isProfit = profit >= 0
 
-  const paymentFee = revenueAmount * 0.029 + 0.3
-  const totalCosts = cogsAmount + hostingAmount + pluginAmount + adSpendAmount + paymentFee
-  const profit = revenueAmount - totalCosts
-  const profitMargin = revenueAmount ? ((profit / revenueAmount) * 100).toFixed(2) : '0.00'
+  const clearForm = () => { setRevenue(5000); setCogs(1800); setHosting(30); setPluginCosts(90); setAdSpend(800) }
 
-  const clearForm = () => {
-    setRevenue(null)
-    setCogs(null)
-    setHosting(null)
-    setPluginCosts(null)
-    setAdSpend(null)
-  }
+  const row = (label, value, red = false) => (
+    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }}>
+      <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{label}</span>
+      <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: red ? '#ef4444' : '#0f172a' }}>{value}</span>
+    </div>
+  )
 
   return (
-    <Calculator
-      title="WooCommerce Profit Calculator"
-      description="Calculate WooCommerce store profit, fees, and recurring platform costs"
-      onClear={clearForm}
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Revenue ({currency})</label>
-            <input type="number" value={formatInputValue(revenue, currency)} onChange={(e) => setRevenue(parseCurrencyInput(e.target.value, currency))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">COGS ({currency})</label>
-            <input type="number" value={formatInputValue(cogs, currency)} onChange={(e) => setCogs(parseCurrencyInput(e.target.value, currency))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Hosting & Maintenance ({currency})</label>
-            <input type="number" value={formatInputValue(hosting, currency)} onChange={(e) => setHosting(parseCurrencyInput(e.target.value, currency))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Plugin / App Costs ({currency})</label>
-            <input type="number" value={formatInputValue(pluginCosts, currency)} onChange={(e) => setPluginCosts(parseCurrencyInput(e.target.value, currency))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Ad Spend ({currency})</label>
-            <input type="number" value={formatInputValue(adSpend, currency)} onChange={(e) => setAdSpend(parseCurrencyInput(e.target.value, currency))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
+    <Calculator title="WooCommerce Profit Calculator" description="Calculate WooCommerce store profitability including hosting, plugins, and payment costs." icon={Store} iconColor="violet" onClear={clearForm}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+        <div className="calc-panel">
+          <h2>Store Details</h2>
+          {[
+            { label: `Monthly Revenue (${currency})`, val: revenue, set: setRevenue },
+            { label: `COGS — Cost of Goods (${currency})`, val: cogs, set: setCogs },
+            { label: `Hosting & Maintenance (${currency})`, val: hosting, set: setHosting },
+            { label: `Plugin / App Costs (${currency})`, val: pluginCosts, set: setPluginCosts },
+            { label: `Monthly Ad Spend (${currency})`, val: adSpend, set: setAdSpend },
+          ].map(({ label, val, set }) => (
+            <div key={label} style={{ marginBottom: '1rem' }}>
+              <label className="form-label">{label}</label>
+              <input type="number" className="form-input" value={formatInputValue(val, currency)} onChange={e => set(parseCurrencyInput(e.target.value, currency))} min="0" step="0.01" />
+            </div>
+          ))}
         </div>
 
-        <div className="bg-blue-50 p-8 rounded-lg">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">Profit Breakdown</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Payment Processing</span>
-              <span className="font-bold">{formatCurrency(paymentFee, currency)}</span>
+        <div className="calc-panel">
+          <h2>Profit Breakdown</h2>
+          {row('Revenue', formatCurrency(rev, currency))}
+          {row('Cost of Goods', formatCurrency(cost, currency), true)}
+          {row('Hosting & Maintenance', formatCurrency(host, currency), true)}
+          {row('Plugin Costs', formatCurrency(plugins, currency), true)}
+          {row('Payment Processing (2.9% + $0.30)', formatCurrency(paymentFee, currency), true)}
+          {row('Ad Spend', formatCurrency(ads, currency), true)}
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.625rem 0', borderBottom: '1.5px solid #e2e8f0', marginBottom: '1.25rem' }}>
+            <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>Total Expenses</span>
+            <span style={{ fontWeight: 800, color: '#ef4444' }}>{formatCurrency(totalCosts, currency)}</span>
+          </div>
+
+          <div style={{ background: isProfit ? '#ecfdf5' : '#fef2f2', border: `1px solid ${isProfit ? '#6ee7b7' : '#fca5a5'}`, borderRadius: 12, padding: '1.125rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span style={{ fontWeight: 700 }}>Net Profit</span>
+              <span style={{ fontSize: '1.375rem', fontWeight: 800, color: isProfit ? '#059669' : '#dc2626' }}>{formatCurrency(profit, currency)}</span>
             </div>
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Hosting & Maintenance</span>
-              <span className="font-bold">{formatCurrency(hostingAmount, currency)}</span>
-            </div>
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Plugin Costs</span>
-              <span className="font-bold">{formatCurrency(pluginAmount, currency)}</span>
-            </div>
-            <div className="flex justify-between items-center pb-2 border-b border-blue-200">
-              <span className="text-gray-700">Total Expenses</span>
-              <span className="font-bold text-red-600">{formatCurrency(totalCosts, currency)}</span>
-            </div>
-            <div className="bg-green-100 p-4 rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-900 font-bold">Net Profit</span>
-                <span className="text-2xl font-bold text-green-600">{formatCurrency(profit, currency)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-900 font-bold">Profit Margin</span>
-                <span className="text-xl font-bold text-green-600">{profitMargin}%</span>
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontWeight: 700 }}>Profit Margin</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 800, color: isProfit ? '#059669' : '#dc2626' }}>{profitMargin}%</span>
             </div>
           </div>
         </div>
+      </div>
+
+      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '1.25rem 1.5rem', marginTop: '1.25rem' }}>
+        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.75rem' }}>WooCommerce Tips</h3>
+        <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', color: '#475569', fontSize: '0.875rem' }}>
+          {['WooCommerce itself is free — but hosting, themes, and plugins add up fast.', 'Use Stripe or PayPal — both charge ~2.9% + $0.30 per transaction.', 'Managed WooCommerce hosting (Kinsta, WP Engine) ranges $30–$100/month.', 'Audit plugin subscriptions quarterly — many stores pay for unused plugins.', 'Consider WooCommerce Payments for an integrated payment solution.'].map(t => (
+            <li key={t} style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#10b981', flexShrink: 0 }}>✓</span>{t}</li>
+          ))}
+        </ul>
       </div>
     </Calculator>
   )
