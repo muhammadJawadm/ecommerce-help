@@ -6,11 +6,11 @@ import { ShoppingCart } from 'lucide-react'
 const planCosts = { basic: 29, shopify: 299, advanced: 2299 }
 
 export default function ShopifyCalculator() {
-  const [revenue, setRevenue] = useState(5000)
-  const [cogs, setCogs] = useState(1500)
+  const [revenue, setRevenue] = useState(0)
+  const [cogs, setCogs] = useState(0)
   const [shopifyPlan, setShopifyPlan] = useState('basic')
-  const [appsMonthly, setAppsMonthly] = useState(150)
-  const [adSpend, setAdSpend] = useState(1000)
+  const [appsMonthly, setAppsMonthly] = useState(0)
+  const [adSpend, setAdSpend] = useState(0)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
   const rev = revenue || 0
@@ -24,7 +24,7 @@ export default function ShopifyCalculator() {
   const profitMargin = rev ? ((profit / rev) * 100).toFixed(2) : '0.00'
   const isProfit = profit >= 0
 
-  const clearForm = () => { setRevenue(5000); setCogs(1500); setShopifyPlan('basic'); setAppsMonthly(150); setAdSpend(1000) }
+  const clearForm = () => { setRevenue(0); setCogs(0); setShopifyPlan('basic'); setAppsMonthly(0); setAdSpend(0) }
 
   const row = (label, value, red = false) => (
     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }}>

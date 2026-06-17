@@ -4,10 +4,10 @@ import { useCurrency } from '../../context/CurrencyContext'
 import { TrendingUp } from 'lucide-react'
 
 export default function ProfitMarginCalculator() {
-  const [revenue, setRevenue] = useState(1000)
-  const [cogs, setCogs] = useState(400)
-  const [opEx, setOpEx] = useState(200)
-  const [taxes, setTaxes] = useState(100)
+  const [revenue, setRevenue] = useState(0)
+  const [cogs, setCogs] = useState(0)
+  const [opEx, setOpEx] = useState(0)
+  const [taxes, setTaxes] = useState(0)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
   const rev = revenue || 0
@@ -22,7 +22,7 @@ export default function ProfitMarginCalculator() {
   const netProfit = operatingProfit - tax
   const netMargin = rev ? ((netProfit / rev) * 100).toFixed(2) : '0.00'
 
-  const clearForm = () => { setRevenue(1000); setCogs(400); setOpEx(200); setTaxes(100) }
+  const clearForm = () => { setRevenue(0); setCogs(0); setOpEx(0); setTaxes(0) }
 
   const marginCard = (label, profit, margin, color, bg, border, note, target) => (
     <div style={{ background: bg, border: `1px solid ${border}`, borderLeft: `4px solid ${color}`, borderRadius: 12, padding: '1.125rem' }}>

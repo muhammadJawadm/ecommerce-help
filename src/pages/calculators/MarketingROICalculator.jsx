@@ -4,10 +4,10 @@ import { useCurrency } from '../../context/CurrencyContext'
 import { BarChart3 } from 'lucide-react'
 
 export default function MarketingROICalculator() {
-  const [adSpend, setAdSpend] = useState(1000)
-  const [revenue, setRevenue] = useState(5000)
-  const [cogs, setCogs] = useState(1500)
-  const [opCosts, setOpCosts] = useState(800)
+  const [adSpend, setAdSpend] = useState(0)
+  const [revenue, setRevenue] = useState(0)
+  const [cogs, setCogs] = useState(0)
+  const [opCosts, setOpCosts] = useState(0)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
   const ads = adSpend || 0
@@ -21,7 +21,7 @@ export default function MarketingROICalculator() {
   const profitMargin = rev ? ((profit / rev) * 100).toFixed(2) : '0.00'
   const isProfit = profit >= 0
 
-  const clearForm = () => { setAdSpend(1000); setRevenue(5000); setCogs(1500); setOpCosts(800) }
+  const clearForm = () => { setAdSpend(0); setRevenue(0); setCogs(0); setOpCosts(0) }
 
   const metricCard = (label, value, desc, color, bg, border) => (
     <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: '1.125rem', marginBottom: '0.75rem' }}>

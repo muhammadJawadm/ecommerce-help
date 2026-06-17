@@ -6,8 +6,8 @@ import { Zap } from 'lucide-react'
 const categoryCommissions = { general: 0.05, electronics: 0.08, beauty: 0.05, clothing: 0.05, home: 0.05 }
 
 export default function TikTokShopCalculator() {
-  const [salePrice, setSalePrice] = useState(50)
-  const [cogs, setCogs] = useState(12)
+  const [salePrice, setSalePrice] = useState(0)
+  const [cogs, setCogs] = useState(0)
   const [category, setCategory] = useState('general')
   const [isCreator, setIsCreator] = useState(false)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
@@ -22,7 +22,7 @@ export default function TikTokShopCalculator() {
   const profitMargin = sale ? ((profit / sale) * 100).toFixed(2) : '0.00'
   const isProfit = profit >= 0
 
-  const clearForm = () => { setSalePrice(50); setCogs(12); setCategory('general'); setIsCreator(false) }
+  const clearForm = () => { setSalePrice(0); setCogs(0); setCategory('general'); setIsCreator(false) }
 
   const row = (label, value, red = false) => (
     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }}>

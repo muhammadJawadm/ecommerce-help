@@ -4,9 +4,9 @@ import { useCurrency } from '../../context/CurrencyContext'
 import { TrendingUp } from 'lucide-react'
 
 export default function EtsyCalculator() {
-  const [salePrice, setSalePrice] = useState(50)
-  const [cogs, setCogs] = useState(12)
-  const [shipping, setShipping] = useState(5)
+  const [salePrice, setSalePrice] = useState(0)
+  const [cogs, setCogs] = useState(0)
+  const [shipping, setShipping] = useState(0)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
   const sale = salePrice || 0
@@ -23,7 +23,7 @@ export default function EtsyCalculator() {
   const breakEven = cost + ship + totalFees
   const isProfit = profit >= 0
 
-  const clearForm = () => { setSalePrice(50); setCogs(12); setShipping(5) }
+  const clearForm = () => { setSalePrice(0); setCogs(0); setShipping(0) }
 
   const row = (label, value, red = false) => (
     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }}>

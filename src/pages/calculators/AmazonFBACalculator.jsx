@@ -4,10 +4,10 @@ import { useCurrency } from '../../context/CurrencyContext'
 import { Package } from 'lucide-react'
 
 export default function AmazonFBACalculator() {
-  const [salePrice, setSalePrice] = useState(50)
-  const [cogs, setCogs] = useState(12)
-  const [weight, setWeight] = useState(1)
-  const [adSpend, setAdSpend] = useState(12)
+  const [salePrice, setSalePrice] = useState(0)
+  const [cogs, setCogs] = useState(0)
+  const [weight, setWeight] = useState(0)
+  const [adSpend, setAdSpend] = useState(0)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
   const sale = salePrice || 0
@@ -24,7 +24,7 @@ export default function AmazonFBACalculator() {
   const breakEvenROAS = sale ? ((productCost + totalFees) / sale).toFixed(2) : '0.00'
   const isProfit = profit >= 0
 
-  const clearForm = () => { setSalePrice(50); setCogs(12); setWeight(1); setAdSpend(12) }
+  const clearForm = () => { setSalePrice(0); setCogs(0); setWeight(0); setAdSpend(0) }
 
   const rowStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }
   const labelStyle = { fontSize: '0.9rem', color: '#64748b' }

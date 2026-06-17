@@ -4,13 +4,13 @@ import { useCurrency } from '../../context/CurrencyContext'
 import { BarChart3 } from 'lucide-react'
 
 export default function BreakEvenROASCalculator() {
-  const [salePrice, setSalePrice] = useState(50)
-  const [cogs, setCogs] = useState(12)
-  const [platformFeePercent, setPlatformFeePercent] = useState(0.15)
-  const [paymentFeePercent, setPaymentFeePercent] = useState(0.05)
-  const [shippingCost, setShippingCost] = useState(5)
-  const [returnRate, setReturnRate] = useState(0.10)
-  const [appCostPerUnit, setAppCostPerUnit] = useState(0.50)
+  const [salePrice, setSalePrice] = useState(0)
+  const [cogs, setCogs] = useState(0)
+  const [platformFeePercent, setPlatformFeePercent] = useState(0)
+  const [paymentFeePercent, setPaymentFeePercent] = useState(0)
+  const [shippingCost, setShippingCost] = useState(0)
+  const [returnRate, setReturnRate] = useState(0)
+  const [appCostPerUnit, setAppCostPerUnit] = useState(0)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
   const sale = salePrice || 0
@@ -30,7 +30,7 @@ export default function BreakEvenROASCalculator() {
   const recommendedROAS = Number(breakEvenROAS) * 1.5
   const profitAtRec = sale - totalCosts - (sale && recommendedROAS ? sale / recommendedROAS : 0)
 
-  const clearForm = () => { setSalePrice(50); setCogs(12); setPlatformFeePercent(0.15); setPaymentFeePercent(0.05); setShippingCost(5); setReturnRate(0.10); setAppCostPerUnit(0.50) }
+  const clearForm = () => { setSalePrice(0); setCogs(0); setPlatformFeePercent(0); setPaymentFeePercent(0); setShippingCost(0); setReturnRate(0); setAppCostPerUnit(0) }
 
   const row = (label, value) => (
     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }}>

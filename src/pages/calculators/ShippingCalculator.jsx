@@ -20,7 +20,7 @@ function getRate(carrier, w) {
 }
 
 export default function ShippingCalculator() {
-  const [weight, setWeight] = useState(2)
+  const [weight, setWeight] = useState(0)
   const [carrier, setCarrier] = useState('usps')
   const { currency, formatCurrency } = useCurrency()
 
@@ -28,7 +28,7 @@ export default function ShippingCalculator() {
   const allRates = Object.entries(shippingRates).map(([key, c]) => ({ key, ...c, rate: getRate(key, weight || 0) }))
   const cheapest = allRates.reduce((a, b) => a.rate < b.rate ? a : b)
 
-  const clearForm = () => { setWeight(2); setCarrier('usps') }
+  const clearForm = () => { setWeight(0); setCarrier('usps') }
 
   return (
     <Calculator title="Shipping Cost Calculator" description="Compare shipping rates across USPS, UPS, FedEx, and DHL carriers." icon={Package} iconColor="teal" onClear={clearForm}>

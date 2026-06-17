@@ -4,11 +4,11 @@ import { useCurrency } from '../../context/CurrencyContext'
 import { Store } from 'lucide-react'
 
 export default function WooCommerceCalculator() {
-  const [revenue, setRevenue] = useState(5000)
-  const [cogs, setCogs] = useState(1800)
-  const [hosting, setHosting] = useState(30)
-  const [pluginCosts, setPluginCosts] = useState(90)
-  const [adSpend, setAdSpend] = useState(800)
+  const [revenue, setRevenue] = useState(0)
+  const [cogs, setCogs] = useState(0)
+  const [hosting, setHosting] = useState(0)
+  const [pluginCosts, setPluginCosts] = useState(0)
+  const [adSpend, setAdSpend] = useState(0)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
   const rev = revenue || 0
@@ -22,7 +22,7 @@ export default function WooCommerceCalculator() {
   const profitMargin = rev ? ((profit / rev) * 100).toFixed(2) : '0.00'
   const isProfit = profit >= 0
 
-  const clearForm = () => { setRevenue(5000); setCogs(1800); setHosting(30); setPluginCosts(90); setAdSpend(800) }
+  const clearForm = () => { setRevenue(0); setCogs(0); setHosting(0); setPluginCosts(0); setAdSpend(0) }
 
   const row = (label, value, red = false) => (
     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }}>

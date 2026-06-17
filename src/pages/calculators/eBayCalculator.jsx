@@ -6,8 +6,8 @@ import { DollarSign } from 'lucide-react'
 const categoryFees = { general: 0.1325, books: 0.09, clothing: 0.1325, electronics: 0.1325, collectibles: 0.10 }
 
 export default function EBayCalculator() {
-  const [salePrice, setSalePrice] = useState(50)
-  const [cogs, setCogs] = useState(12)
+  const [salePrice, setSalePrice] = useState(0)
+  const [cogs, setCogs] = useState(0)
   const [category, setCategory] = useState('general')
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
@@ -21,7 +21,7 @@ export default function EBayCalculator() {
   const breakEven = cost + totalFees
   const isProfit = profit >= 0
 
-  const clearForm = () => { setSalePrice(50); setCogs(12); setCategory('general') }
+  const clearForm = () => { setSalePrice(0); setCogs(0); setCategory('general') }
 
   const row = (label, value, red = false) => (
     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }}>

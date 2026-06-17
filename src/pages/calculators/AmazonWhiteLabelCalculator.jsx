@@ -4,12 +4,12 @@ import { useCurrency } from '../../context/CurrencyContext'
 import { Factory } from 'lucide-react'
 
 export default function AmazonWhiteLabelCalculator() {
-  const [salePrice, setSalePrice] = useState(45)
-  const [cogs, setCogs] = useState(12)
-  const [fbaFee, setFbaFee] = useState(5.5)
-  const [prepFee, setPrepFee] = useState(1.25)
-  const [adSpend, setAdSpend] = useState(8)
-  const [launchBudget, setLaunchBudget] = useState(15)
+  const [salePrice, setSalePrice] = useState(0)
+  const [cogs, setCogs] = useState(0)
+  const [fbaFee, setFbaFee] = useState(0)
+  const [prepFee, setPrepFee] = useState(0)
+  const [adSpend, setAdSpend] = useState(0)
+  const [launchBudget, setLaunchBudget] = useState(0)
   const { currency, formatCurrency, formatInputValue, parseCurrencyInput } = useCurrency()
 
   const sale = salePrice || 0
@@ -27,7 +27,7 @@ export default function AmazonWhiteLabelCalculator() {
   const roi = cost ? (((profit) / cost) * 100).toFixed(2) : '0.00'
   const isProfit = profit >= 0
 
-  const clearForm = () => { setSalePrice(45); setCogs(12); setFbaFee(5.5); setPrepFee(1.25); setAdSpend(8); setLaunchBudget(15) }
+  const clearForm = () => { setSalePrice(0); setCogs(0); setFbaFee(0); setPrepFee(0); setAdSpend(0); setLaunchBudget(0) }
 
   const row = (label, value, red = false) => (
     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid #f1f5f9' }}>
